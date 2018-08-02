@@ -10,12 +10,15 @@ import java.util.Scanner;
 
 import entities.Client;
 import entities.Comment;
+import entities.CompanyPayer;
 import entities.Department;
 import entities.HourContract;
 import entities.ImportedProduct;
+import entities.IndividualPayer;
 import entities.Order;
 import entities.Order1;
 import entities.OrderItem;
+import entities.Payer;
 import entities.Post;
 import entities.Product;
 import entities.UsedProduct;
@@ -25,14 +28,56 @@ import entities.enums.WorkerLevel;
 
 public class Program {
 
-	public static void main(String[] args) throws ParseException {
+	public static void main(String[] args) {
+		Locale.setDefault(Locale.US);
+		Scanner sc = new Scanner(System.in);
+
+		System.out.print("Enter the number of tax payers: ");
+		int n = sc.nextInt();
+		List<Payer> list = new ArrayList<>();
+		for (int i = 1; i <= n; i++) {
+			System.out.println("Tax payer #" + i + " data:");
+			System.out.print("Individual or company (i/c)? ");
+			char c = sc.next().charAt(0);
+			System.out.print("Name: ");
+			sc.nextLine();
+			String name = sc.nextLine();
+			System.out.print("Anual income: ");
+			Double income = sc.nextDouble();
+			
+			if (c == 'i') {
+				System.out.print("Health expenditures: ");
+				Double healthExpenditures = sc.nextDouble();
+				list.add(new IndividualPayer(name, income, healthExpenditures));
+			}
+			
+			if (c == 'c') {
+				System.out.print("Number of employees: ");
+				Integer numberEmployees = sc.nextInt();
+				list.add(new CompanyPayer(name, income, numberEmployees));
+			}
+		}
+		
+		System.out.println();
+		System.out.println("TAXES PAID:");
+		Double sum = 0.0;
+		for(Payer p : list) {
+			System.out.println(p);
+			sum += p.tax();
+		}
+		System.out.println();
+		System.out.println("TOTAL TAXES: $ " + sum);
+		sc.close();
+	}
+
+	public static void exercicioHeranca1() throws ParseException {
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 		Locale.setDefault(Locale.US);
 		Scanner sc = new Scanner(System.in);
 
 		System.out.print("Enter the number of products: ");
 		int n = sc.nextInt();
-		
+
 		List<Product> list = new ArrayList<>();
 		for (int i = 1; i <= n; i++) {
 			System.out.println("Product #" + i + " data:");
@@ -61,10 +106,10 @@ public class Program {
 				list.add(new ImportedProduct(name, price, customsFee));
 			}
 		}
-		
+
 		System.out.println();
 		System.out.println("PRICE TAGS");
-		for(Product p : list) {
+		for (Product p : list) {
 			System.out.println(p.priceTag());
 		}
 
