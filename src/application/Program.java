@@ -2,7 +2,9 @@ package application;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Scanner;
 
@@ -10,11 +12,13 @@ import entities.Client;
 import entities.Comment;
 import entities.Department;
 import entities.HourContract;
+import entities.ImportedProduct;
 import entities.Order;
 import entities.Order1;
 import entities.OrderItem;
 import entities.Post;
 import entities.Product;
+import entities.UsedProduct;
 import entities.Worker;
 import entities.enums.OrderStatus;
 import entities.enums.WorkerLevel;
@@ -25,39 +29,45 @@ public class Program {
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 		Locale.setDefault(Locale.US);
 		Scanner sc = new Scanner(System.in);
-		
-		
-		System.out.println("Enter client data:");
-		System.out.print("Name: ");
-		String name = sc.nextLine();
-		System.out.print("Email: ");
-		String email = sc.nextLine();
-		System.out.print("Birth date (DD/MM/YYYY): ");
-		Date birthDate = sdf.parse(sc.nextLine());
-		
-		System.out.println("Enter order data:");
-		System.out.print("Status: ");
-		String status = sc.nextLine();
-		Date moment = new Date();
-		Order1 order = new Order1(moment, OrderStatus.valueOf(status), new Client(name, email, birthDate) ); 
-		
-		System.out.print("How many items to this order? ");
+
+		System.out.print("Enter the number of products: ");
 		int n = sc.nextInt();
 		
-		for (int i=1; i<=n; i++) {
-			System.out.println("Enter #" + i + " item data: ");
-			System.out.print("Product name: ");
+		List<Product> list = new ArrayList<>();
+		for (int i = 1; i <= n; i++) {
+			System.out.println("Product #" + i + " data:");
+			char c;
+			do {
+				System.out.print("Common, used or imported (c/u/i)? ");
+				c = sc.next().charAt(0);
+				if (c != 'c' && c != 'u' && c != 'i') {
+					System.out.println("Enter the correct character (c/u/i)");
+				}
+			} while (c != 'c' && c != 'u' && c != 'i');
+			System.out.print("Name: ");
 			sc.nextLine();
-			String productName = sc.nextLine();
-			System.out.print("Product price: ");
-			Double productPrice = sc.nextDouble();
-			System.out.print("Quantity: ");
-			int productQuantity = sc.nextInt();
-			order.addItem(new OrderItem(productQuantity, productPrice, new Product(productName, productPrice)));
+			String name = sc.nextLine();
+			System.out.print("Price: ");
+			Double price = sc.nextDouble();
+			if (c == 'c') {
+				list.add(new Product(name, price));
+			} else if (c == 'u') {
+				System.out.print("Manufacture date (DD/MM/YYYY): ");
+				Date manufactureDate = sdf.parse(sc.next());
+				list.add(new UsedProduct(name, price, manufactureDate));
+			} else if (c == 'i') {
+				System.out.print("Customs fee: ");
+				Double customsFee = sc.nextDouble();
+				list.add(new ImportedProduct(name, price, customsFee));
+			}
 		}
 		
 		System.out.println();
-		System.out.println(order);
+		System.out.println("PRICE TAGS");
+		for(Product p : list) {
+			System.out.println(p.priceTag());
+		}
+
 		sc.close();
 	}
 
@@ -80,6 +90,45 @@ public class Program {
 		System.out.println(p1);
 
 		System.out.println(p2);
+	}
+
+	public static void composicao2() throws ParseException {
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+		Locale.setDefault(Locale.US);
+		Scanner sc = new Scanner(System.in);
+
+		System.out.println("Enter client data:");
+		System.out.print("Name: ");
+		String name = sc.nextLine();
+		System.out.print("Email: ");
+		String email = sc.nextLine();
+		System.out.print("Birth date (DD/MM/YYYY): ");
+		Date birthDate = sdf.parse(sc.nextLine());
+
+		System.out.println("Enter order data:");
+		System.out.print("Status: ");
+		String status = sc.nextLine();
+		Date moment = new Date();
+		Order1 order = new Order1(moment, OrderStatus.valueOf(status), new Client(name, email, birthDate));
+
+		System.out.print("How many items to this order? ");
+		int n = sc.nextInt();
+
+		for (int i = 1; i <= n; i++) {
+			System.out.println("Enter #" + i + " item data: ");
+			System.out.print("Product name: ");
+			sc.nextLine();
+			String productName = sc.nextLine();
+			System.out.print("Product price: ");
+			Double productPrice = sc.nextDouble();
+			System.out.print("Quantity: ");
+			int productQuantity = sc.nextInt();
+			order.addItem(new OrderItem(productQuantity, productPrice, new Product(productName, productPrice)));
+		}
+
+		System.out.println();
+		System.out.println(order);
+		sc.close();
 	}
 
 	public static void resolvido1() throws ParseException {
